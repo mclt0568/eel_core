@@ -1,6 +1,7 @@
-from type_def import EelTypeArithmetic, EelTypeBase, EelTypeString
+from type_def import EelTypeArithmetic, EelTypeBase, EelTypeString, decode_literal_or_repr
 from exceptions import EelExcInvalidOperation, EelExcTypeError
 from typing import Callable
+from misc import read_to_eof
 
 BASIC_INTERFACE: dict[str, Callable] = {}
 
@@ -42,7 +43,7 @@ def arithmetic(left: EelTypeArithmetic, operator: EelTypeString, right: EelTypeB
 
   if not issubclass(type(right), EelTypeArithmetic):
     raise EelExcTypeError(f"{arithmetic.__name__}: "+
-                          f"{EelTypeArithmetic.NAME} operand expected, got {type(left).NAME}")
+                          f"{EelTypeArithmetic.NAME} operand expected, got {type(right).NAME}")
   
   op_str = operator.value
 
@@ -74,3 +75,18 @@ def arithmetic(left: EelTypeArithmetic, operator: EelTypeString, right: EelTypeB
     
     case _:
       raise EelExcInvalidOperation(f"{op_str} is not a valid operator")
+
+@basic_interface("from_file")
+def from_file(filename: EelTypeString = EelTypeString("")) -> EelTypeBase:
+  if filename.value == "":
+    return EelTypeString(read_to_eof())
+  
+  with open(filename.value, "r") as f:
+    return EelTypeString(f.read())
+  
+@basic_interface("to_num")
+def to_num(val: EelTypeBase | None = None) -> EelTypeBase:
+  if val is None:
+    val = decode_literal_or_repr(read_to_eof())
+
+  return val.eel_to_number()
