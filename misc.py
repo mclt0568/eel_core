@@ -1,3 +1,10 @@
+from sys import stdin
+
+LINE_BREAK = "\n"
+
+def read_to_eof() -> str:
+  return "".join(l for l in stdin)
+
 def is_int(string: str) -> bool:
   try:
     int(string)

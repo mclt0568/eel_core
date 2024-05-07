@@ -2,13 +2,15 @@ __all__ = [
   "EelExcSysTypeError",
   "EelExcInvalidOperation",
   "EelExcNotAnEelRepr",
-  "EelExcTypeError"
+  "EelExcTypeError",
+  "EelExcCommandNotFound"
 ]
 
 
 class EelExcBaseException(Exception):
-  def __init__(self, message: str, name: str) -> None:
+  def __init__(self, message: str, name: str, exit_code: int = 1) -> None:
     self.name = name
+    self.exit_code = exit_code
     super().__init__(message)
 
 # System Exception
@@ -30,6 +32,10 @@ class EelExcSysTypeError(EelExcSystemException):
     super().__init__(message, "TypeError")
 
 # Generic Exception
+
+class EelExcCommandNotFound(EelExcBaseException):
+  def __init__(self, message: str):
+    super().__init__(message, "CommandNotFound", 127)
 
 class EelExcInvalidOperation(EelExcBaseException):
   def __init__(self, message: str):

@@ -24,10 +24,10 @@ def eel_type(prefix: str, name: str) -> Callable[[type], type]:
   return register_type
 
 
-def eel_operation(func: Callable) -> Callable:
-  def check_call(self, other) -> EelTypeBase:
-    if issubclass(type(other), EelTypeBase):
-      return func(self, other)
+def eel_bin_operation(func: Callable) -> Callable:
+  def check_call(self, *others) -> EelTypeBase:
+    if issubclass(type(others[0]), EelTypeBase):
+      return func(self, *others)
 
     raise EelExcSysTypeError()
 
@@ -77,25 +77,29 @@ class EelTypeBase(ABC, Generic[T]):
   @abstractmethod
   def eel_to_bool(self) -> EelTypeBool: ...
 
-  @eel_operation
+  @eel_bin_operation
   def eel_op_comp(self, other: EelTypeBase) -> EelTypeBool:
     return EelTypeBool(self.value == other.value)
 
-  @eel_operation
+  @eel_bin_operation
+  def eel_op_neq(self, other: EelTypeBase) -> EelTypeBool:
+    return self.eel_op_comp(other).eel_op_not()
+
+  @eel_bin_operation
   def eel_op_and(self, other: EelTypeBase) -> EelTypeBase:
     if self.eel_to_bool().value:
       return other
     
     return self
 
-  @eel_operation
+  @eel_bin_operation
   def eel_op_or(self, other: EelTypeBase) -> EelTypeBase:
     if self.eel_to_bool().value:
       return self
     
     return other
 
-  @eel_operation
+  @eel_bin_operation
   def eel_op_not(self) -> EelTypeBool:
     return EelTypeBool(not self.value)
 
@@ -104,40 +108,40 @@ class EelTypeArithmetic:
   value: object
   NAME: str
 
-  @eel_operation
+  @eel_bin_operation
   def eel_arith_basic(self, other: EelTypeBase, computation: Callable) -> EelTypeBase:
-    if issubclass(type(other), type(self)):
+    if not issubclass(type(other), type(self)):
       raise EelExcInvalidOperation(f"Cannot evaluate {self.NAME} + {type(other.NAME)}")
     
     return computation(self, other)
 
   def eel_arith_add(self, other: EelTypeBase) -> EelTypeBase:
     comp = lambda x, y: type(self)(x.value + y.value) # type: ignore
-    return self.eel_arith_basic(other, type(self), comp)
+    return self.eel_arith_basic(other, comp)
 
   def eel_arith_sub(self, other: EelTypeBase) -> EelTypeBase:
     comp = lambda x, y: type(self)(x.value - y.value) # type: ignore
-    return self.eel_arith_basic(other, type(self), comp)
+    return self.eel_arith_basic(other, comp)
 
   def eel_arith_mul(self, other: EelTypeBase) -> EelTypeBase:
     comp = lambda x, y: type(self)(x.value * y.value) # type: ignore
-    return self.eel_arith_basic(other, type(self), comp)
+    return self.eel_arith_basic(other, comp)
 
   def eel_arith_div(self, other: EelTypeBase) -> EelTypeBase:
     comp = lambda x, y: type(self)(x.value / y.value) # type: ignore
-    return self.eel_arith_basic(other, type(self), comp)
+    return self.eel_arith_basic(other, comp)
 
   def eel_arith_mod(self, other: EelTypeBase) -> EelTypeBase:
     comp = lambda x, y: type(self)(x.value % y.value) # type: ignore
-    return self.eel_arith_basic(other, type(self), comp)
+    return self.eel_arith_basic(other, comp)
 
   def eel_arith_exp(self, other: EelTypeBase) -> EelTypeBase:
     comp = lambda x, y: type(self)(x.value ** y.value) # type: ignore
-    return self.eel_arith_basic(other, type(self), comp)
+    return self.eel_arith_basic(other, comp)
 
   def eel_arith_floordiv(self, other: EelTypeBase) -> EelTypeBase:
     comp = lambda x, y: type(self)(x.value // y.value) # type: ignore
-    return self.eel_arith_basic(other, type(self), comp)
+    return self.eel_arith_basic(other, comp)
 
 
 class EelTypeSequence:
@@ -157,15 +161,15 @@ class EelTypeComparable:
   value: object
   eel_op_comp: Callable[[EelTypeBase], EelTypeBase]
 
-  @eel_operation
+  @eel_bin_operation
   def eel_op_greater(self, other: EelTypeBase) -> EelTypeBool:
     return EelTypeBool(self.value > other.value)
   
-  @eel_operation
+  @eel_bin_operation
   def eel_op_less(self, other: EelTypeBase) -> EelTypeBool:
     return EelTypeBool(self.value < other.value)
 
-  @eel_operation
+  @eel_bin_operation
   def eel_op_greater_or_eq(self, other: EelTypeBase) -> EelTypeBool:
     comp = self.eel_op_greater(other)
     if not comp.value:
@@ -173,7 +177,7 @@ class EelTypeComparable:
     
     return comp
   
-  @eel_operation
+  @eel_bin_operation
   def eel_op_less_or_eq(self, other: EelTypeBase) -> EelTypeBool:
     comp = self.eel_op_less(other)
     if not comp.value:
