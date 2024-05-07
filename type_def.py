@@ -158,24 +158,24 @@ class EelTypeComparable:
   eel_op_comp: Callable[[EelTypeBase], EelTypeBase]
 
   @eel_operation
-  def eel_op_larger(self, other: EelTypeBase) -> EelTypeBool:
+  def eel_op_greater(self, other: EelTypeBase) -> EelTypeBool:
     return EelTypeBool(self.value > other.value)
   
   @eel_operation
-  def eel_op_smaller(self, other: EelTypeBase) -> EelTypeBool:
+  def eel_op_less(self, other: EelTypeBase) -> EelTypeBool:
     return EelTypeBool(self.value < other.value)
 
   @eel_operation
-  def eel_op_larger_or_eq(self, other: EelTypeBase) -> EelTypeBool:
-    comp = self.eel_op_larger(other)
+  def eel_op_greater_or_eq(self, other: EelTypeBase) -> EelTypeBool:
+    comp = self.eel_op_greater(other)
     if not comp.value:
       return self.eel_op_comp(other)
     
     return comp
   
   @eel_operation
-  def eel_op_smaller_or_eq(self, other: EelTypeBase) -> EelTypeBool:
-    comp = self.eel_op_smaller(other)
+  def eel_op_less_or_eq(self, other: EelTypeBase) -> EelTypeBool:
+    comp = self.eel_op_less(other)
     if not comp.value:
       return self.eel_op_comp(other)
     
