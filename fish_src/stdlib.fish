@@ -1,3 +1,3 @@
 function arith
-  python stdlib.py arith $argv
+  python3 cli_runner.py arith $argv
 end
