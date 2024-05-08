@@ -36,9 +36,13 @@ if __name__ == "__main__":
     stderr.write(format_exc())
     stderr.write("\n")
     stderr.flush()
+    stdout.write(f"err@{e.exit_code}")
+    stdout.flush()
     exit(e.exit_code)
 
   except EelExcBaseException as e:
     stderr.write(f"{e.name}: {e}\n")
     stderr.flush()
+    stdout.write(f"err@{e.exit_code}")
+    stdout.flush()
     exit(e.exit_code)

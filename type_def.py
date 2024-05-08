@@ -276,6 +276,19 @@ class EelTypeDict(EelTypeBase[dict], EelTypeSequence): ...
 class EelTypeBool(EelTypeBase[bool]): ...
 
 
+@eel_type("err", "Error")
+class EelTypeError(EelTypeNumber):
+  @staticmethod
+  def eel_from_repr(repr: str) -> EelTypeNumber:
+    if is_int(repr) and 0 <= int(repr) <= 127:
+      return EelTypeError(int(repr))
+
+    raise EelExcSysTypeError(f"{repr} is not a valid Error code")
+
+  def eel_to_repr(self) -> str:
+    return str(self.value)
+
+
 
 ###############################################################################
 """

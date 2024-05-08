@@ -33,6 +33,10 @@ class EelExcSysTypeError(EelExcSystemException):
 
 # Generic Exception
 
+class EelWhenEvaluating(EelExcBaseException):
+  def __init__(self, message: str, exit_code: int):
+    super().__init__(message, "  when evaluating", exit_code)
+
 class EelExcCommandNotFound(EelExcBaseException):
   def __init__(self, message: str):
     super().__init__(message, "CommandNotFound", 127)

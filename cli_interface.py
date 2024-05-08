@@ -4,8 +4,8 @@ from typing import get_args, get_origin, Callable, Iterable
 from types import UnionType
 from inspect import signature, _ParameterKind
 
-from type_def import EelTypeBase, EelTypeString, decode_literal_or_repr
-from exceptions import EelExcNotAnEelRepr, EelExcTypeError
+from type_def import EelTypeBase, EelTypeString, EelTypeError, decode_literal_or_repr
+from exceptions import EelExcNotAnEelRepr, EelExcTypeError, EelWhenEvaluating
 from misc import read_to_eof
 
 
@@ -22,7 +22,12 @@ def convert_arg(raw: str, pipe_in: bool = True) -> EelTypeBase:
     raw = raw[1:]
 
   try:
-    return decode_literal_or_repr(raw)
+    result = decode_literal_or_repr(raw)
+
+    if issubclass(type(result), EelTypeError):
+      raise EelWhenEvaluating(f"", result.value)
+    
+    return result
   
   except EelExcNotAnEelRepr:
     return EelTypeString(raw)
@@ -66,7 +71,10 @@ def basic_interface(name: str, pipe_in: bool = True):
       
       for i, arg in enumerate(args):
         arg_type = arg_types[positional[i]]
-        converted_arg = convert_arg(arg, pipe_in)
+        try:
+          converted_arg = convert_arg(arg, pipe_in)
+        except EelWhenEvaluating as e:
+          raise EelWhenEvaluating(f"{name} {' '.join(args)}", e.exit_code)
         
         if not issubclass(type(converted_arg), arg_type):
           get_name = lambda t: (t.NAME if hasattr(t, "NAME") else t.__name__)
