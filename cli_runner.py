@@ -1,6 +1,4 @@
-from sys import stdout, stderr, exit, argv
-
-from traceback import format_exc
+from sys import stdout, stderr, exit, argv, exc_info
 
 from exceptions import EelExcBaseException, EelExcSystemException
 from exceptions import EelExcCommandNotFound, EelExcArgumentError
@@ -33,7 +31,7 @@ if __name__ == "__main__":
     exit(0)
 
   except EelExcSystemException as e:
-    stderr.write(format_exc())
+    stderr.write(f"{e.name}: {e}")
     stderr.write("\n")
     stderr.flush()
     stdout.write(f"err@{e.exit_code}")
@@ -46,3 +44,12 @@ if __name__ == "__main__":
     stdout.write(f"err@{e.exit_code}")
     stdout.flush()
     exit(e.exit_code)
+
+  except Exception as e:
+    ex_type, ex_value, ex_traceback = exc_info()
+
+    stderr.write(f"python@{ex_type.__name__}: {e}\n")
+    stderr.flush()
+    stdout.write(f"err@120")
+    stdout.flush()
+    exit(120)
