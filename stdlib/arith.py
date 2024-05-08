@@ -1,6 +1,6 @@
 from type_def import EelTypeArithmetic, EelTypeString, EelTypeBase
 from cli_interface import basic_interface
-from exceptions import EelExcInvalidOperation
+from exceptions import EelExcInvalidOperation, EelExcTypeError
 
 
 OPERATOR_LOOKUP: dict[str, str] = {
@@ -22,6 +22,12 @@ OPERATOR_LOOKUP: dict[str, str] = {
 
 @basic_interface("arith")
 def arith(left: EelTypeArithmetic, operator: EelTypeString, right: EelTypeBase) -> EelTypeBase:
+  get_type_name = lambda x: x.NAME if hasattr(x, "NAME") else x.__name__
+
+  if not issubclass(type(right), EelTypeArithmetic):
+    raise EelExcTypeError(
+            f"arith on arg#2: expected Arithmetic, got {get_type_name(type(right))}")
+
   op_str = operator.value
 
   if op_str in OPERATOR_LOOKUP:
