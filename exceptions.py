@@ -25,7 +25,7 @@ class EelExcSystemException(EelExcBaseException):
     if message is None:
       message = "Unknown error has occurred"
 
-    super().__init__(message, f"InternalError{name}")
+    super().__init__(message, f"InternalError{name}", 120)
 
 class EelExcSysTypeError(EelExcSystemException):
   def __init__(self, message: str | None = None):
@@ -37,14 +37,18 @@ class EelExcCommandNotFound(EelExcBaseException):
   def __init__(self, message: str):
     super().__init__(message, "CommandNotFound", 127)
 
+class EelExcArgumentError(EelExcBaseException):
+  def __init__(self, message: str):
+    super().__init__(message, "ArgumentError", 1)
+
 class EelExcInvalidOperation(EelExcBaseException):
   def __init__(self, message: str):
-    super().__init__(message, "InvalidOperationError")
+    super().__init__(message, "InvalidOperationError", 2)
 
 class EelExcNotAnEelRepr(EelExcBaseException):
   def __init__(self, message: str):
-    super().__init__(message, "NotAnEelRepr")
+    super().__init__(message, "NotAnEelRepr", 3)
 
 class EelExcTypeError(EelExcBaseException):
   def __init__(self, message: str):
-    super().__init__(message, "TypeError")
+    super().__init__(message, "TypeError", 4)
