@@ -37,18 +37,22 @@ class EelExcCommandNotFound(EelExcBaseException):
   def __init__(self, message: str):
     super().__init__(message, "CommandNotFound", 127)
 
+class EelExcFileError(EelExcBaseException):
+  def __init__(self, message: str):
+    super().__init__(message, "FileError", 1)
+
 class EelExcArgumentError(EelExcBaseException):
   def __init__(self, message: str):
-    super().__init__(message, "ArgumentError", 1)
+    super().__init__(message, "ArgumentError", 2)
 
 class EelExcInvalidOperation(EelExcBaseException):
   def __init__(self, message: str):
-    super().__init__(message, "InvalidOperationError", 2)
+    super().__init__(message, "InvalidOperationError", 3)
 
 class EelExcNotAnEelRepr(EelExcBaseException):
   def __init__(self, message: str):
-    super().__init__(message, "NotAnEelRepr", 3)
+    super().__init__(message, "NotAnEelRepr", 4)
 
 class EelExcTypeError(EelExcBaseException):
   def __init__(self, message: str):
-    super().__init__(message, "TypeError", 4)
+    super().__init__(message, "TypeError", 5)
